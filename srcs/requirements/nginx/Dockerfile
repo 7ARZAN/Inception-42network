@@ -6,9 +6,14 @@
 #    By: elakhfif <elakhfif@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/12 09:24:37 by elakhfif          #+#    #+#              #
-#    Updated: 2024/02/21 00:49:41 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/02/26 02:39:05 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM	debian:buster
 
+RUN	apt -y update && apt install -y ngingx && apt install openssl -y && apt install -y vim && apt install -y curl
+
+COPY	./srcs/ohmyscript.sh /
+
+CMD	["bash", "ohmyscript.sh"]
