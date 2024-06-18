@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/13 05:18:22 by tarzan            #+#    #+#              #
-#    Updated: 2024/03/25 09:08:03 by tarzan           ###   ########.fr        #
+#    Updated: 2024/06/18 13:42:10 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -58,4 +58,4 @@ re: fclean all
 
 .PHONY: all build run stop clean fclean re
 
-#docker run -d --name my_nginx -p 80:80 -v /var/www/html:/usr/share/nginx/html --network bridge --env AUTOINDEX=on my_nginx:1.0
+docker run -d --name my_nginx -p 80:80 -v /var/www/html:/usr/share/nginx/html --network bridge --env AUTOINDEX=on my_nginx:1.0
