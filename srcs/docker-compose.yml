@@ -1,0 +1,77 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    docker-compose.yml                                 :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/01/13 05:12:11 by tarzan            #+#    #+#              #
+#    Updated: 2024/03/25 09:04:21 by tarzan           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+version: "3.5"
+
+volumes:
+    nginx:
+        name: nginx
+        driver: local
+        driver_opts: /Users/$(USER)/Desktop/Inception/src/nginx
+        o: bind
+        type: none
+    wordpress:
+        name: wordpress
+        driver: local
+        driver_opts: /Users/$(USER)/Desktop/Inception/src/wordpress
+        o: bind
+        type: none
+    mariadb:
+        name: mariadb
+        driver: local
+        driver_opts: /Users/$(USER)/Desktop/Inception/src/mariadb #here we drops the path where all mariadb drives located
+        o: bind
+        type: none
+
+networks:
+    inception:
+        name: inception
+        driver: bridge
+
+services:
+    # Nginx Service
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        volumes:
+            - nginx:/etc/nginx/conf.d
+            - nginx:/etc/nginx/ssl
+            - nginx:/var/www/html
+        ports:
+            - "80:80"
+            - "443:443"
+        networks:
+            - inception
+    # Wordpress Service
+    wordpress:
+        image: wordpress:latest
+        container_name: wordpress
+        volumes:
+            - wordpress:/var/www/html
+        environment:
+            WORDPRESS_DB_HOST: mariadb:3306
+            WORDPRESS_DB_USER: root
+            WORDPRESS_DB_PASSWORD: root
+            WORDPRESS_DB_NAME: wordpress
+        networks:
+            - inception
+    # MariaDB Service
+    mariadb:
+        image: mariadb:latest
+        container_name: mariadb
+        volumes:
+            - mariadb:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: wordpress
+        networks:
+            - inception

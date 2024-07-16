@@ -1,0 +1,19 @@
+server{
+	listen 443 ssl;
+	listen[::]:433 ssl;
+
+	server_name	www.elakhfif.1337.ma elakhfif.1337.ma;
+
+	ssl_certificate	;
+	ssl_certificate_key	;
+
+	ssl_protocols	TLSv1.3;
+
+	index	index.php;
+
+	root	/var/www/html;
+
+	location	{
+
+	}
+}
