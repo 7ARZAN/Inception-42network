@@ -5,25 +5,20 @@
 #                                                     +:+ +:+         +:+      #
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/09/22 11:41:29 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 00:14:34 by tarzan           ###   ########.fr        #
+#    Created: 2024/09/22 11:44:55 by tarzan            #+#    #+#              #
+#    Updated: 2024/09/24 14:18:27 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM		debian:bookworm
+FROM	debian:bookworm
 
-RUN		apt-get update && apt-get install -y nginx \
-		openssl -y 
+RUN	apt-get update && apt-get install -y redis
 
-RUN		mkdir -p /etc/ssl/certs/ \
-		mkdir -p && /etc/ssl/private/ 
+COPY	./utils/entrypoint.sh /entrypoint.sh
 
-COPY		/configuration/nginx.conf /etc/nginx/nginx.conf
+RUN	chmod +x /entrypoint.sh && mv entrypoint.sh /usr/bin/entrypoint.sh
 
-COPY		utils/entrypoint.sh /usr/local/bin/
+EXPOSE	6379
 
-RUN		chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT	[ "entrypoint.sh" ]
 
-ENTRYPOINT	["entrypoint.sh"]
-
-#CMD ["nginx", "-g", "daemon off;"]

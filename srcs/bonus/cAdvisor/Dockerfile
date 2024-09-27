@@ -5,25 +5,16 @@
 #                                                     +:+ +:+         +:+      #
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/09/22 11:41:29 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 00:14:34 by tarzan           ###   ########.fr        #
+#    Created: 2024/09/24 14:28:49 by tarzan            #+#    #+#              #
+#    Updated: 2024/09/27 02:08:32 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM		debian:bookworm
+FROM	alpine:3.17
 
-RUN		apt-get update && apt-get install -y nginx \
-		openssl -y 
+RUN	apk -U upgrade && apk add --no-cache wget bash
 
-RUN		mkdir -p /etc/ssl/certs/ \
-		mkdir -p && /etc/ssl/private/ 
+RUN	wget -O /usr/local/bin/cadvisor https://github.com/google/cadvisor/releases/download/v0.47.0/cadvisor && \
+	chmod +x /usr/local/bin/cadvisor
 
-COPY		/configuration/nginx.conf /etc/nginx/nginx.conf
-
-COPY		utils/entrypoint.sh /usr/local/bin/
-
-RUN		chmod +x /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT	["entrypoint.sh"]
-
-#CMD ["nginx", "-g", "daemon off;"]
+CMD	[ "bash", "-c", "echo -e \"\033[1;32mStarting cadvisor...\" && /usr/local/bin/cadvisor" ]

@@ -5,25 +5,24 @@
 #                                                     +:+ +:+         +:+      #
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/09/22 11:41:29 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 00:14:34 by tarzan           ###   ########.fr        #
+#    Created: 2024/09/22 11:44:36 by tarzan            #+#    #+#              #
+#    Updated: 2024/09/27 01:52:46 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM		debian:bookworm
+FROM	debian:bookworm
 
-RUN		apt-get update && apt-get install -y nginx \
-		openssl -y 
+ENV	FTP_USER=tarzan
+ENV	FTP_PASS=Tarzan123
 
-RUN		mkdir -p /etc/ssl/certs/ \
-		mkdir -p && /etc/ssl/private/ 
+RUN	apt-get update && apt-get install -y vsftpd
 
-COPY		/configuration/nginx.conf /etc/nginx/nginx.conf
+COPY	./configuration/vsftpd.conf /etc/vsftpd/vsftpd.conf
 
-COPY		utils/entrypoint.sh /usr/local/bin/
+RUN	mkdir -p /var/share/ftp
 
-RUN		chmod +x /usr/local/bin/entrypoint.sh
+EXPOSE	21
 
-ENTRYPOINT	["entrypoint.sh"]
+RUN	useradd -m $FTP_USER && echo "$FTP_USER:$FTP_PASS" | chpasswd
 
-#CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT	[ "/usr/sbin/vsftpd", "/etc/vsftpd/vsftpd.conf" ]

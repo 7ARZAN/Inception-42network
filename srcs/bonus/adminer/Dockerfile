@@ -5,25 +5,21 @@
 #                                                     +:+ +:+         +:+      #
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/09/22 11:41:29 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 00:14:34 by tarzan           ###   ########.fr        #
+#    Created: 2024/09/22 11:44:27 by tarzan            #+#    #+#              #
+#    Updated: 2024/09/27 01:55:24 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM		debian:bookworm
 
-RUN		apt-get update && apt-get install -y nginx \
-		openssl -y 
+RUN		apt-get update && apt-get install -y curl php-fpm && mkdir -p /run/php
 
-RUN		mkdir -p /etc/ssl/certs/ \
-		mkdir -p && /etc/ssl/private/ 
+COPY		./configuration/www.conf /etc/php/8.0/fpm/pool.d/www.conf
 
-COPY		/configuration/nginx.conf /etc/nginx/nginx.conf
+COPY		./utils/entrypoint.sh /entrypoint.sh
 
-COPY		utils/entrypoint.sh /usr/local/bin/
+RUN		chmod +x /entrypoint.sh && mv entrypoint.sh /usr/local/bin/
 
-RUN		chmod +x /usr/local/bin/entrypoint.sh
+EXPOSE		6969
 
-ENTRYPOINT	["entrypoint.sh"]
-
-#CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT	[ "entrypoint.sh" ]
