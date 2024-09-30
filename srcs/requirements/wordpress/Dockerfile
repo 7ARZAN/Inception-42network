@@ -6,30 +6,27 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:41:05 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 00:12:01 by tarzan           ###   ########.fr        #
+#    Updated: 2024/09/30 16:55:04 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM	debian:bookworm
+FROM		alpine:3.19
 
-RUN		apt-get update && apt-get install -y php-fpm \
-		php-mysql \
-		curl \
-		mariadb-client \
-		redis \
-		php-redis \
-		grep 
+RUN		apk update && apk add --no-cache php82-fpm php82-mysqli && \
+		mkdir -p /www && \
+		chown -R www-data:www-data /www && \
+		chmod -R 755 /www
 
-RUN		mkdir -p /run/php 
+COPY		configuration/www.conf /etc/php82/php-fpm.d/
 
-COPY		configuration/www.conf /etc/php/7.3/fpm/pool.d/www.conf
+ADD		https://wordpress.org/latest.zip latest.zip
 
-COPY		configuration/wp-config.php /
+RUN		unzip latest.zip && \
+		rm -rf latest.zip && \
+		mv wordpress /www/ && \
+		chown -R www-data:www-data /www/wordpress && \
+		chmod -R 755 /www/wordpress
 
 EXPOSE		9000
 
-COPY		./utils/entrypoint.sh /usr/bin/entrypoint.sh
-
-RUN		chmod +x /usr/bin/entrypoint.sh
-
-ENTRYPOINT	[ "entrypoint.sh" ]
+ENTRYPOINT	[ "php-fpm82", "--allow-to-rub-as-root", "-F" ]

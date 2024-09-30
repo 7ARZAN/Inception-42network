@@ -6,19 +6,17 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:44:55 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/24 14:18:27 by tarzan           ###   ########.fr        #
+#    Updated: 2024/09/30 17:45:00 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM	debian:bookworm
+FROM		alpine:3.19
 
-RUN	apt-get update && apt-get install -y redis
+RUN		apk add --no-cache redis && \
+		sed -i 's/^daemonize yes/daemonize no/' /etc/redis/redis.conf && \
+    		sed -i 's/^bind 127.0.0.1 -::1/bind 0.0.0.0/' /etc/redis/redis.conf && \
+    		sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis/redis.conf
 
-COPY	./utils/entrypoint.sh /entrypoint.sh
+EXPOSE 		6379
 
-RUN	chmod +x /entrypoint.sh && mv entrypoint.sh /usr/bin/entrypoint.sh
-
-EXPOSE	6379
-
-ENTRYPOINT	[ "entrypoint.sh" ]
-
+ENTRYPOINT	[ "redis-server", "/etc/redis/redis.conf" ]

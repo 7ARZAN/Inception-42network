@@ -6,20 +6,18 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:44:27 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 01:55:24 by tarzan           ###   ########.fr        #
+#    Updated: 2024/09/30 17:29:16 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM		debian:bookworm
+FROM		alpine:3.19
 
-RUN		apt-get update && apt-get install -y curl php-fpm && mkdir -p /run/php
+RUN		apk add --no-cache php8 php8-fpm php8-mysqli wget
 
-COPY		./configuration/www.conf /etc/php/8.0/fpm/pool.d/www.conf
+WORKDIR		/var/www/html
 
-COPY		./utils/entrypoint.sh /entrypoint.sh
+COPY		./tools/init.sh /init.sh
 
-RUN		chmod +x /entrypoint.sh && mv entrypoint.sh /usr/local/bin/
+RUN		chmod +x /init.sh
 
-EXPOSE		6969
-
-ENTRYPOINT	[ "entrypoint.sh" ]
+ENTRYPOINT	[ "/bin/sh", "-c", "/entrypoint.sh && php-fpm8 -F" ]

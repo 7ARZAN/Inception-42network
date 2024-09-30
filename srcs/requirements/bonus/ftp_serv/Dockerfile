@@ -6,23 +6,18 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:44:36 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 01:52:46 by tarzan           ###   ########.fr        #
+#    Updated: 2024/09/30 17:41:46 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM	debian:bookworm
+FROM		alpine:3.19
 
-ENV	FTP_USER=tarzan
-ENV	FTP_PASS=Tarzan123
+RUN		apk add --no-cache vsftpd vim 
 
-RUN	apt-get update && apt-get install -y vsftpd
+COPY		./utils/entrypoint.sh /entrypoint.sh
 
-COPY	./configuration/vsftpd.conf /etc/vsftpd/vsftpd.conf
+RUN		chmod +x /init.sh
 
-RUN	mkdir -p /var/share/ftp
+EXPOSE		21
 
-EXPOSE	21
-
-RUN	useradd -m $FTP_USER && echo "$FTP_USER:$FTP_PASS" | chpasswd
-
-ENTRYPOINT	[ "/usr/sbin/vsftpd", "/etc/vsftpd/vsftpd.conf" ]
+ENTRYPOINT	[ "/bin/sh", "-c", "/entrypoint.sh && /usr/sbin/vsftpd" ]

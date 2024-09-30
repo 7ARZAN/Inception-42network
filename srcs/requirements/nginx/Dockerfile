@@ -6,24 +6,21 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:41:29 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 00:14:34 by tarzan           ###   ########.fr        #
+#    Updated: 2024/09/30 16:43:19 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM		debian:bookworm
+FROM		alpine:3.19
 
-RUN		apt-get update && apt-get install -y nginx \
-		openssl -y 
+RUN		apk update && \
+		apl add --no-cache nginx openssl && \
+		mkdir -p /etc/nginx/ssl /www && \
+		ln -s /dev/stdout /var/log/nginx/access.log && \
+		openssl genrsa -out /etc/nginx/ssl/localhost.key 2048 && \
+		openssl req -batch -new -key /etc/nginx/ssl/localhost.key -out /etc/nginx/ssl/localhost.csr && \
+		openssl x509 -req -days 365 -in /etc/nginx/ssl/localhost.csr -signkey /etc/nginx/ssl/localhost.key -out /etc/nginx/ssl/localhost.crt && \
+		chmod 600 /etc/nginx/ssl/*
 
-RUN		mkdir -p /etc/ssl/certs/ \
-		mkdir -p && /etc/ssl/private/ 
+COPY		/configuration/default.conf /etc/nginx/default.conf
 
-COPY		/configuration/nginx.conf /etc/nginx/nginx.conf
-
-COPY		utils/entrypoint.sh /usr/local/bin/
-
-RUN		chmod +x /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT	["entrypoint.sh"]
-
-#CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT	["nginx", "-g", "daemon off;"]

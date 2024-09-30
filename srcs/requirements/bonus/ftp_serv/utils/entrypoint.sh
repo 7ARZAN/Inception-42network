@@ -5,32 +5,34 @@
 #                                                     +:+ +:+         +:+      #
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/09/30 17:32:07 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/30 17:33:05 by tarzan           ###   ########.fr        #
+#    Created: 2024/09/30 17:38:39 by tarzan            #+#    #+#              #
+#    Updated: 2024/09/30 17:40:48 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #!/bin/sh
 
-echo	"Initializing Adminer setup..."
+echo	"Initializing FTP setup..."
 
-ADMINER_DIR="/var/www/html/adminer"
-mkdir -p "$ADMINER_DIR"
+if [ ! -d "/var/run/vsftpd/empty" ]; then
+	mkdir -p /var/run/vsftpd/empty
 
-ADMINER_URL="https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1.php"
-ADMINER_PATH="$ADMINER_DIR/index.php"
+	sed -i 's/#chroot_local_user=YES/chroot_local_user=YES/' /etc/vsftpd.conf
 
-if [ ! -f "$ADMINER_PATH" ]; then
-	echo "Downloading Adminer..."
-	wget -q "$ADMINER_URL" -O "$ADMINER_PATH"
-	echo "Adminer downloaded successfully!"
+    # Create the FTP user
+
+    if id "$FTP_USER" &>/dev/null; then
+	    echo "User $FTP_USER already exists."
+    else
+	    adduser -D -h /var/www/html "$FTP_USER" && \
+		    echo "$FTP_USER:$FTP_PASS" | chpasswd && \
+		    echo "FTP user $FTP_USER created successfully!"
+    fi
+
+    chmod	755 /home/"$FTP_USER"
+    echo	"FTP setup completed!"
 else
-	echo "Adminer is already installed."
+	echo	"FTP setup already completed."
 fi
-
-chmod	644 "$ADMINER_PATH"
-echo	"Permissions set for Adminer."
-
-echo	"Adminer setup completed successfully!"
 
 exec	"$@"

@@ -6,27 +6,20 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:41:47 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/26 23:44:47 by tarzan           ###   ########.fr        #
+#    Updated: 2024/09/30 17:19:30 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM		alpine:3.15.0
+FROM		alpine:3.19
 
-RUN		apk update && apk add --no-cache \
-		mariadb mariadb-client 
+# Install MariaDB and remove unnecessary files to keep the image small
+RUN		apk add --no-cache mariadb mariadb-client && \
+		sed -i 's#^bind-address\s*=.*#bind-address = 0.0.0.0#' /etc/my.cnf && \
+		mkdir -p /run/mysqld && chown -R mysql:mysql /run/mysqld
 
-COPY		/conf/mariadb-server.cnf /etc/my.cnf.d/mariadb-server.cnf
+# Copy the initialization script
+COPY		./utils/entrypoint.sh /
 
-COPY		utils/entrypoint.sh /usr/local/bin/entrypoint.sh
+# Set the entrypoint to the initialization script and start the MariaDB server
+ENTRYPOINT	[ "sh", "-c", "/entrypoint.sh && mysqld --user=mysql --bind-address=0.0.0.0" ]
 
-RUN		chmod +x /usr/local/bin/entrypoint.sh
-
-#RUN		chmod 777 /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT	[ "entrypoint.sh" ]
-
-EXPOSE		3306
-
-STOPSIGNAL	SIGQUIT
-
-VOLUME		[ "/var/lib/mysql" ]
