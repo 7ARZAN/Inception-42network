@@ -13,9 +13,14 @@
 FROM		alpine:3.19
 
 RUN		apk update && apk add --no-cache php82-fpm php82-mysqli && \
-		mkdir -p /www && \
-		chown -R www-data:www-data /www && \
-		chmod -R 755 /www
+		mkdir -p /var/www/html
+
+RUN		if ! getent group www-data > /dev/null; then \
+			addgroup -S www-data; \
+		fi && \
+		if ! getent passwd www-data > /dev/null; then \
+			adduser -S www-data -G www-data; \
+		fi 
 
 COPY		configuration/www.conf /etc/php82/php-fpm.d/
 
@@ -23,10 +28,8 @@ ADD		https://wordpress.org/latest.zip latest.zip
 
 RUN		unzip latest.zip && \
 		rm -rf latest.zip && \
-		mv wordpress /www/ && \
-		chown -R www-data:www-data /www/wordpress && \
-		chmod -R 755 /www/wordpress
+		mv wordpress/* /var/www/html && \
+		chown -R www-data:www-data /var/www/html && \
+		chmod -R 755 /var/www/html/
 
-EXPOSE		9000
-
-ENTRYPOINT	[ "php-fpm82", "--allow-to-rub-as-root", "-F" ]
+ENTRYPOINT	[ "php-fpm82", "--allow-to-run-as-root", "-F" ]

@@ -13,14 +13,14 @@
 FROM		alpine:3.19
 
 RUN		apk update && \
-		apl add --no-cache nginx openssl && \
-		mkdir -p /etc/nginx/ssl /www && \
+		apk add --no-cache nginx openssl && \
+		mkdir -p /etc/nginx/ssl /var/www/html/ && \
 		ln -s /dev/stdout /var/log/nginx/access.log && \
-		openssl genrsa -out /etc/nginx/ssl/localhost.key 2048 && \
-		openssl req -batch -new -key /etc/nginx/ssl/localhost.key -out /etc/nginx/ssl/localhost.csr && \
-		openssl x509 -req -days 365 -in /etc/nginx/ssl/localhost.csr -signkey /etc/nginx/ssl/localhost.key -out /etc/nginx/ssl/localhost.crt && \
+		openssl genrsa -out /etc/nginx/ssl/nginx.key 2048 && \
+		openssl req -batch -new -key /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.csr && \
+		openssl x509 -req -days 365 -in /etc/nginx/ssl/nginx.csr -signkey /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt && \
 		chmod 600 /etc/nginx/ssl/*
 
-COPY		/configuration/default.conf /etc/nginx/default.conf
+COPY		/configuration/default.conf /etc/nginx/nginx.conf
 
 ENTRYPOINT	["nginx", "-g", "daemon off;"]

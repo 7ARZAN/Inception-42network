@@ -12,14 +12,15 @@
 
 FROM		alpine:3.19
 
-# Install MariaDB and remove unnecessary files to keep the image small
 RUN		apk add --no-cache mariadb mariadb-client && \
 		sed -i 's#^bind-address\s*=.*#bind-address = 0.0.0.0#' /etc/my.cnf && \
-		mkdir -p /run/mysqld && chown -R mysql:mysql /run/mysqld
+		mkdir -p /run/mysqld && chown -R mysql:mysql /run/mysqld && \
+		mysql_install_db --user=mysql --datadir=/var/lib/mysql 
 
-# Copy the initialization script
-COPY		./utils/entrypoint.sh /
+COPY 		./utils/entrypoint.sh /entrypoint.sh
 
-# Set the entrypoint to the initialization script and start the MariaDB server
-ENTRYPOINT	[ "sh", "-c", "/entrypoint.sh && mysqld --user=mysql --bind-address=0.0.0.0" ]
+RUN 		chmod +x /entrypoint.sh
 
+ENTRYPOINT 	[ "sh", "/entrypoint.sh" ]
+
+CMD		["mysqld", "--user=mysql", "--bind-address=0.0.0.0"]

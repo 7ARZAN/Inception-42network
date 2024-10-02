@@ -15,23 +15,23 @@ services:
 
   nginx:
     build:
-      context: ./srcs/requirements/nginx
+      context: ./requirements/nginx
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "8080:80"
       - "443:443"
     volumes:
-      - ./srcs/requirements/nginx/conf.d:/etc/nginx/conf.d
+      - wordpress_data:/var/www/html
     networks:
       - inception_network
     restart: always
 
   mariadb:
     build:
-      context: ./srcs/requirements/mariadb
+      context: ./requirements/mariadb
       dockerfile: Dockerfile
-    environment:
-      MYSQL_ROOT_PASSWORD: example
+    env_file:
+      - .env
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
@@ -40,7 +40,7 @@ services:
 
   wordpress:
     build:
-      context: ./srcs/requirements/wordpress
+      context: ./requirements/wordpress
       dockerfile: Dockerfile
     environment:
       WORDPRESS_DB_HOST: mariadb
@@ -53,8 +53,8 @@ services:
     restart: always
 
 volumes:
-  mariadb_data:
-  wordpress_data:
+    mariadb_data:
+    wordpress_data:
 
 networks:
   inception_network:
