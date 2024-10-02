@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:41:29 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/30 16:43:19 by tarzan           ###   ########.fr        #
+#    Updated: 2024/10/02 07:14:48 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,5 +22,7 @@ RUN		apk update && \
 		chmod 600 /etc/nginx/ssl/*
 
 COPY		/configuration/default.conf /etc/nginx/nginx.conf
+
+EXPOSE		80 443
 
 ENTRYPOINT	["nginx", "-g", "daemon off;"]

@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:41:47 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/30 17:19:30 by tarzan           ###   ########.fr        #
+#    Updated: 2024/10/02 07:15:30 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,5 +22,7 @@ COPY 		./utils/entrypoint.sh /entrypoint.sh
 RUN 		chmod +x /entrypoint.sh
 
 ENTRYPOINT 	[ "sh", "/entrypoint.sh" ]
+
+EXPOSE		3306
 
 CMD		["mysqld", "--user=mysql", "--bind-address=0.0.0.0"]

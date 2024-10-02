@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:41:05 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/30 16:55:04 by tarzan           ###   ########.fr        #
+#    Updated: 2024/10/02 07:19:05 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,4 +32,8 @@ RUN		unzip latest.zip && \
 		chown -R www-data:www-data /var/www/html && \
 		chmod -R 755 /var/www/html/
 
-ENTRYPOINT	[ "php-fpm82", "--allow-to-run-as-root", "-F" ]
+EXPOSE		9000
+
+USER		www-data
+
+ENTRYPOINT	[ "php-fpm82", "-F" ]
