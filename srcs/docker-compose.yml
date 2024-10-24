@@ -1,0 +1,109 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    docker-compose.yml                                 :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/09/27 23:28:09 by tarzan            #+#    #+#              #
+#    Updated: 2024/10/24 17:45:40 by elakhfif         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+name: inception
+
+services:
+    mariadb:
+        container_name: mariadb
+        build:
+            context: ./requirements/mariadb
+        expose:
+            - "3306/tcp"
+        volumes:
+            - type: volume
+              source: database
+              target: /data
+              read_only: false
+        networks:
+            back_network:
+                aliases:
+                    - database
+                    - mariadb
+        secrets:
+            - database-credentials
+        healthcheck:
+            test: ["CMD", "mysqladmin", "-u", "stats", "--protocol=tcp", "ping"]
+            interval: 5m
+            timeout: 5s
+            retries: 3
+            start_period: 2m
+            start_interval: 3s
+        restart: always
+
+    wordpress:
+        container_name: wordpress
+        build:
+            context: ./requirements/wordpress
+        expose:
+            - "9000/tcp"
+        env_file:
+            - path: ./.env
+              required: true
+        volumes:
+            - type: volume
+              source: wordprss_files
+              target: /www
+              read_only: false
+        networks:
+            back_network:
+            front_network:
+                aliases:
+                    - wordpress
+        secrets:
+            - database-credentials
+            - wordpress-credentials
+        depends_on:
+            mariadb:
+                condition: service_healthy
+                required: true
+        healthcheck:
+            test: ["CMD", "pgrep", "php-fpm"]
+            interval: 5m
+            timeout: 5s
+            retries: 3
+            start_period: 2m
+            start_interval: 3s
+        restart: always
+    
+    nginx:
+        container_name: nginx
+        build:
+            context: ./requirements/nginx
+        ports:
+            - 443:443
+        volumes:
+            - type: volume
+              source: wordprss_files
+              target: /www
+              read_only: false
+        networks:
+            front_network:
+        depends_on:
+            wordpress:
+                condition: service_healthy
+                required: true
+        restart: always
+
+volumes:
+    database:
+    wordprss_files:
+
+networks:
+    back_network:
+    front_network:
+
+secrets:
+    database-credentials:
+        file: ../secrets/db_credentials.env
+    wordpress-credentials:
+        file: ../secrets/wp_credentials.env

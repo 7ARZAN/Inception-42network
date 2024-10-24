@@ -6,32 +6,29 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:41:05 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/02 19:25:36 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/24 17:51:55 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM		alpine:3.19
 
-RUN		apk update && apk add --no-cache php82-fpm php82-mysqli && \
-		mkdir -p /var/www/html
+COPY		./utils/entrypoint.sh /
 
-RUN		if ! getent group www-data > /dev/null; then \
-			addgroup -S www-data; \
-		fi && \
-		if ! getent passwd www-data > /dev/null; then \
-			adduser -S www-data -G www-data; \
-		fi 
+ADD		https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar /usr/local/bin/wp
 
-COPY		configuration/www.conf /etc/php82/php-fpm.d/
+RUN		apk update && apk add --no-cache \
+		php82-fpm php82-mysqli php82-phar \
+		php82-iconv php82-mbstring && \
+		chmod +x /usr/local/bin/wp /entrypoint.sh && \
+		wp core download --path=/www && \
+		rm -rf /root/.wp-cli && \
+		ln -s /dev/stdout /var/log/php82/access.log && \
+		ln -s /dev/stderr /var/log/php82/error.log
 
-ADD		https://wordpress.org/latest.zip latest.zip
+COPY		./configuration/www.conf /etc/php82/php-fpm.d/
 
-RUN		unzip latest.zip && \
-		rm -rf latest.zip && \
-		mv wordpress/* /var/www/html && \
-		chown -R www-data:www-data /var/www/html && \
-		chmod -R 755 /var/www/html/
-
-EXPOSE		9000
-
-ENTRYPOINT	[ "php-fpm82", "--allow-to-run-as-root", "-F" ]
+COPY		./configuration/wp-config.php /www
+    
+EXPOSE		9000/tcp
+    
+ENTRYPOINT	[ "sh", "entrypoint.sh" ]

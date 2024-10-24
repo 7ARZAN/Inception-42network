@@ -6,28 +6,39 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/24 14:11:56 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/30 17:22:41 by tarzan           ###   ########.fr        #
+#    Updated: 2024/10/24 17:35:06 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #!/bin/sh
 
-echo	"Database Name: $DB_NAME"
+source /run/secrets/database-credentials
 
-if [ ! -d "/var/lib/mysql/wpdb" ]; then
-	{
-		echo "FLUSH PRIVILEGES;"
-		echo "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
-		echo "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASS';"
-		echo "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';"
-		echo "FLUSH PRIVILEGES;"
-	} > init.sql
+cat << EOF > query.sql
+CREATE DATABASE IF NOT EXISTS $DB_NAME;
+CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWD';
+GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';
+CREATE USER IF NOT EXISTS 'stats'@'%';
+GRANT PROCESS ON *.* TO 'stats'@'%';
+DELETE FROM mysql.user WHERE User='';
+FLUSH PRIVILEGES;
+EOF
 
-	mariadbd --user=mysql --bootstrap < init.sql
-	rm init.sql
-	echo "Database created successfully!"
-else
-	echo "Error: Database already exists."
-fi
+mysqld --user=mysql --datadir=/data > /dev/null 2>&1 &
 
-exec	"$@"
+sleep 5
+
+mysql -u root < query.sql
+
+kill $(jobs -p)
+
+rm -f query.sql
+
+cat << 'EOF' > launch.sh
+#!/bin/sh
+exec mysqld --user=mysql --datadir=/data --port=3306 --bind-address=0.0.0.0 --skip-networking=0
+EOF
+
+chmod +x launch.sh
+
+exec mysqld --user=mysql --datadir=/data --port=3306 --bind-address=0.0.0.0 --skip-networking=0

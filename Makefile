@@ -6,19 +6,22 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/13 05:18:22 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 23:49:57 by tarzan           ###   ########.fr        #
+#    Updated: 2024/10/20 18:12:54 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #----------------------------- Colors Variables -------------------------------#
+
 RED			= \033[0;31m
 GREEN			= \033[0;32m
 NC			= \033[0m
+
 #----------------------------- Docker Variables -------------------------------#
+
 NAME			= inception
 VERSION			= 1.0
-DOCKER_COMPOSE		= docker compose
-COMPOSE_FILE		= srcs/docker-compose.yaml
+DOCKER_COMPOSE		= docker-compose
+COMPOSE_FILE		= srcs/docker-compose.yml
 
 #---------------------------------- Rules -------------------------------------#
 
