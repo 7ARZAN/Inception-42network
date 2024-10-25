@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 23:28:09 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/24 17:45:40 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/25 03:22:42 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -94,6 +94,34 @@ services:
                 required: true
         restart: always
 
+    ftpserv:
+        container_name: ftp
+        build: ./requirements/bonus/vsftpd
+        ports:
+          - 21:21/tcp
+          - 5000-5050:5000-5050/tcp
+        networks:
+          - front_network
+        restart: always
+        depends_on:
+          - nginx
+        volumes:
+          - type: volume
+            source: wordprss_files
+            target: /www
+            read_only: false
+        secrets:
+          - ftp-credentials
+
+    redis:
+      container_name: redis
+      build: ./requirements/bonus/redis
+      expose:
+        - "6379/tcp"
+      networks:
+        - back_network
+      restart: always
+
 volumes:
     database:
     wordprss_files:
@@ -107,3 +135,5 @@ secrets:
         file: ../secrets/db_credentials.env
     wordpress-credentials:
         file: ../secrets/wp_credentials.env
+    ftp-credentials:
+        file: ../secrets/ftp_credentials.env

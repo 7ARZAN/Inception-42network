@@ -6,17 +6,15 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/22 11:44:55 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/30 17:45:00 by tarzan           ###   ########.fr        #
+#    Updated: 2024/10/25 03:24:59 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 FROM		alpine:3.19
 
-RUN		apk add --no-cache redis && \
-		sed -i 's/^daemonize yes/daemonize no/' /etc/redis/redis.conf && \
-    		sed -i 's/^bind 127.0.0.1 -::1/bind 0.0.0.0/' /etc/redis/redis.conf && \
-    		sed -i 's/^protected-mode yes/protected-mode no/' /etc/redis/redis.conf
+RUN		apk update && apk add --no-cache redis
 
-EXPOSE 		6379
+EXPOSE		6379/tcp
 
-ENTRYPOINT	[ "redis-server", "/etc/redis/redis.conf" ]
+ENTRYPOINT	[ "redis-server", "--protected-mode", "no", "--bind", "0.0.0.0", \
+			"--maxmemory", "50mb", "--maxmemory-policy", "allkeys-lru"]

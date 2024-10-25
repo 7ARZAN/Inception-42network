@@ -6,33 +6,18 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/30 17:38:39 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/30 17:40:48 by tarzan           ###   ########.fr        #
+#    Updated: 2024/10/25 03:13:09 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #!/bin/sh
 
-echo	"Initializing FTP setup..."
+source /run/secrets/ftp_credentials
 
-if [ ! -d "/var/run/vsftpd/empty" ]; then
-	mkdir -p /var/run/vsftpd/empty
+adduser $FTP_USER -Dh /www
 
-	sed -i 's/#chroot_local_user=YES/chroot_local_user=YES/' /etc/vsftpd.conf
+echo "$FTP_USER:$FTP_PASSWD" | chpasswd
 
-    # Create the FTP user
+echo -e "#!/bin/sh\n\nexec vsftpd /vsftpd.conf" > launch.sh
 
-    if id "$FTP_USER" &>/dev/null; then
-	    echo "User $FTP_USER already exists."
-    else
-	    adduser -D -h /var/www/html "$FTP_USER" && \
-		    echo "$FTP_USER:$FTP_PASS" | chpasswd && \
-		    echo "FTP user $FTP_USER created successfully!"
-    fi
-
-    chmod	755 /home/"$FTP_USER"
-    echo	"FTP setup completed!"
-else
-	echo	"FTP setup already completed."
-fi
-
-exec	"$@"
+exec vsftpd /vsftpd.conf
