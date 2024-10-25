@@ -16,8 +16,8 @@ RUN		apk add --no-cache php8 php8-fpm php8-mysqli wget
 
 WORKDIR		/var/www/html
 
-COPY		./tools/init.sh /init.sh
+COPY		./utils/entrypoint.sh /entrypoint.sh
 
-RUN		chmod +x /init.sh
+RUN		chmod +x /entrypoint.sh
 
 ENTRYPOINT	[ "/bin/sh", "-c", "/entrypoint.sh && php-fpm8 -F" ]
