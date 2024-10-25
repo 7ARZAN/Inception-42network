@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 23:28:09 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/25 18:31:02 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/25 19:01:05 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -75,10 +75,10 @@ services:
     restart: always
 
   ftpserv:
-    container_name: ftp
+    container_name: ftpserv
     build: ./requirements/bonus/vsftpd
     ports:
-      - "21:21"
+      - "210:21"
       - "5000-5050:5000-5050"
     networks:
       - inception_network
