@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/13 05:18:22 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/20 18:12:54 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/25 21:33:20 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,16 +18,16 @@ NC			= \033[0m
 
 #----------------------------- Docker Variables -------------------------------#
 
-NAME			= inception
-VERSION			= 1.0
 DOCKER_COMPOSE		= docker-compose
 COMPOSE_FILE		= srcs/docker-compose.yml
+SCRIPT_PATH 		= srcs/requirements/utils/init_datadir.sh
 
 #---------------------------------- Rules -------------------------------------#
 
 all: up
 
 up: build
+	@bash $(SCRIPT_PATH)
 	@$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)Containers are up and running$(NC)"
 

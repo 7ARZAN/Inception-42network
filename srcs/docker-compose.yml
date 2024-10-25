@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 23:28:09 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/25 03:22:42 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/25 21:33:57 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,15 +17,10 @@ services:
         container_name: mariadb
         build:
             context: ./requirements/mariadb
-        expose:
-            - "3306/tcp"
         volumes:
-            - type: volume
-              source: database
-              target: /data
-              read_only: false
+            - database:/data
         networks:
-            back_network:
+            inception_network:
                 aliases:
                     - database
                     - mariadb
@@ -37,26 +32,19 @@ services:
             timeout: 5s
             retries: 3
             start_period: 2m
-            start_interval: 3s
         restart: always
 
     wordpress:
         container_name: wordpress
         build:
             context: ./requirements/wordpress
-        expose:
-            - "9000/tcp"
         env_file:
             - path: ./.env
               required: true
         volumes:
-            - type: volume
-              source: wordprss_files
-              target: /www
-              read_only: false
+            - wordprss_files:/www
         networks:
-            back_network:
-            front_network:
+            inception_network:
                 aliases:
                     - wordpress
         secrets:
@@ -65,14 +53,12 @@ services:
         depends_on:
             mariadb:
                 condition: service_healthy
-                required: true
         healthcheck:
             test: ["CMD", "pgrep", "php-fpm"]
             interval: 5m
             timeout: 5s
             retries: 3
             start_period: 2m
-            start_interval: 3s
         restart: always
     
     nginx:
@@ -82,53 +68,61 @@ services:
         ports:
             - 443:443
         volumes:
-            - type: volume
-              source: wordprss_files
-              target: /www
-              read_only: false
+            - wordprss_files:/www
         networks:
-            front_network:
+            inception_network:
         depends_on:
             wordpress:
                 condition: service_healthy
-                required: true
         restart: always
 
     ftpserv:
-        container_name: ftp
+        container_name: vsftpd
         build: ./requirements/bonus/vsftpd
         ports:
-          - 21:21/tcp
-          - 5000-5050:5000-5050/tcp
+            - 21:21/tcp
+            - 5000-5050:5000-5050/tcp
         networks:
-          - front_network
-        restart: always
+            inception_network:
         depends_on:
-          - nginx
+            wordpress:
+                condition: service_healthy
+
         volumes:
-          - type: volume
-            source: wordprss_files
-            target: /www
-            read_only: false
+            - wordprss_files:/www
         secrets:
-          - ftp-credentials
+            - ftp-credentials
+        restart: always
 
     redis:
-      container_name: redis
-      build: ./requirements/bonus/redis
-      expose:
-        - "6379/tcp"
-      networks:
-        - back_network
-      restart: always
+        container_name: redis
+        build: ./requirements/bonus/redis
+        networks:
+            inception_network:
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5m
+            timeout: 5s
+            retries: 3
+            start_period: 2m
+        restart: always
 
 volumes:
     database:
+      driver: local
+      driver_opts:
+        type: none
+        device: /home/elakhfif/data/database
+        o: bind
     wordprss_files:
+      driver: local
+      driver_opts:
+        type: none
+        device: /home/elakhfif/data/wordprss_files
+        o: bind
 
 networks:
-    back_network:
-    front_network:
+    inception_network:
 
 secrets:
     database-credentials:
