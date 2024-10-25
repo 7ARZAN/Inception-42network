@@ -6,121 +6,134 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 23:28:09 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/25 19:01:05 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/25 03:22:42 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 name: inception
 
 services:
-  mariadb:
-    container_name: mariadb
-    build:
-      context: ./requirements/mariadb
-    expose:
-      - "3306"
-    volumes:
-      - database:/data
-    networks:
-      - inception_network
-    secrets:
-      - database-credentials
-    healthcheck:
-      test: ["CMD", "mysqladmin", "-u", "stats", "--protocol=tcp", "ping"]
-      interval: 5m
-      timeout: 5s
-      retries: 3
-      start_period: 2m
-    restart: always
+    mariadb:
+        container_name: mariadb
+        build:
+            context: ./requirements/mariadb
+        expose:
+            - "3306/tcp"
+        volumes:
+            - type: volume
+              source: database
+              target: /data
+              read_only: false
+        networks:
+            back_network:
+                aliases:
+                    - database
+                    - mariadb
+        secrets:
+            - database-credentials
+        healthcheck:
+            test: ["CMD", "mysqladmin", "-u", "stats", "--protocol=tcp", "ping"]
+            interval: 5m
+            timeout: 5s
+            retries: 3
+            start_period: 2m
+            start_interval: 3s
+        restart: always
 
-  wordpress:
-    container_name: wordpress
-    build:
-      context: ./requirements/wordpress
-    expose:
-      - "9000"
-    env_file:
-      - ./.env
-    volumes:
-      - wordprss_files:/www
-    networks:
-      - inception_network
-    secrets:
-      - database-credentials
-      - wordpress-credentials
-    depends_on:
-      mariadb:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "pgrep", "php-fpm"]
-      interval: 5m
-      timeout: 5s
-      retries: 3
-      start_period: 2m
-    restart: always
+    wordpress:
+        container_name: wordpress
+        build:
+            context: ./requirements/wordpress
+        expose:
+            - "9000/tcp"
+        env_file:
+            - path: ./.env
+              required: true
+        volumes:
+            - type: volume
+              source: wordprss_files
+              target: /www
+              read_only: false
+        networks:
+            back_network:
+            front_network:
+                aliases:
+                    - wordpress
+        secrets:
+            - database-credentials
+            - wordpress-credentials
+        depends_on:
+            mariadb:
+                condition: service_healthy
+                required: true
+        healthcheck:
+            test: ["CMD", "pgrep", "php-fpm"]
+            interval: 5m
+            timeout: 5s
+            retries: 3
+            start_period: 2m
+            start_interval: 3s
+        restart: always
+    
+    nginx:
+        container_name: nginx
+        build:
+            context: ./requirements/nginx
+        ports:
+            - 443:443
+        volumes:
+            - type: volume
+              source: wordprss_files
+              target: /www
+              read_only: false
+        networks:
+            front_network:
+        depends_on:
+            wordpress:
+                condition: service_healthy
+                required: true
+        restart: always
 
-  nginx:
-    container_name: nginx
-    build:
-      context: ./requirements/nginx
-    ports:
-      - "443:443"
-    volumes:
-      - wordprss_files:/www
-    networks:
-      - inception_network
-    depends_on:
-      wordpress:
-        condition: service_healthy
-    restart: always
+    ftpserv:
+        container_name: ftp
+        build: ./requirements/bonus/vsftpd
+        ports:
+          - 21:21/tcp
+          - 5000-5050:5000-5050/tcp
+        networks:
+          - front_network
+        restart: always
+        depends_on:
+          - nginx
+        volumes:
+          - type: volume
+            source: wordprss_files
+            target: /www
+            read_only: false
+        secrets:
+          - ftp-credentials
 
-  ftpserv:
-    container_name: ftpserv
-    build: ./requirements/bonus/vsftpd
-    ports:
-      - "210:21"
-      - "5000-5050:5000-5050"
-    networks:
-      - inception_network
-    restart: always
-    depends_on:
-      - nginx
-    volumes:
-      - wordprss_files:/www
-    secrets:
-      - ftp-credentials
-
-  redis:
-    container_name: redis
-    build: ./requirements/bonus/redis
-    expose:
-      - "6379"
-    networks:
-      - inception_network
-    restart: always
-  
-  adminer:
-    container_name: adminer
-    build: ./requirements/bonus/adminer
-    volumes:
-      - wordprss_files:/www
-    depends_on:
-      - wordpress
-    networks:
-      - inception_network
-
+    redis:
+      container_name: redis
+      build: ./requirements/bonus/redis
+      expose:
+        - "6379/tcp"
+      networks:
+        - back_network
+      restart: always
 
 volumes:
-  database:
-  wordprss_files:
+    database:
+    wordprss_files:
 
 networks:
-  inception_network:
+    back_network:
+    front_network:
 
 secrets:
-  database-credentials:
-    file: ../secrets/db_credentials.env
-  wordpress-credentials:
-    file: ../secrets/wp_credentials.env
-  ftp-credentials:
-    file: ../secrets/ftp_credentials.env
+    database-credentials:
+        file: ../secrets/db_credentials.env
+    wordpress-credentials:
+        file: ../secrets/wp_credentials.env
+    ftp-credentials:
+        file: ../secrets/ftp_credentials.env
