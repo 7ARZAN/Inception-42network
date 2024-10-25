@@ -39,6 +39,6 @@ cat << 'EOF' > launch.sh
 exec mysqld --user=mysql --datadir=/data --port=3306 --bind-address=0.0.0.0 --skip-networking=0
 EOF
 
-chmod +x launch.sh
+chmod +x entrypoint.sh
 
 exec mysqld --user=mysql --datadir=/data --port=3306 --bind-address=0.0.0.0 --skip-networking=0
