@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 23:28:09 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/25 21:33:57 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/26 04:07:23 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -87,7 +87,6 @@ services:
         depends_on:
             wordpress:
                 condition: service_healthy
-
         volumes:
             - wordprss_files:/www
         secrets:
@@ -105,6 +104,18 @@ services:
             timeout: 5s
             retries: 3
             start_period: 2m
+        restart: always
+
+    adminer:
+        container_name: adminer
+        build: ./requirements/bonus/adminer
+        networks:
+            inception_network:
+        depends_on:
+            wordpress:
+                condition: service_healthy
+        volumes:
+            - wordprss_files:/www
         restart: always
 
 volumes:

@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/13 05:18:22 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/25 21:33:20 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/26 04:03:07 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,9 +18,11 @@ NC			= \033[0m
 
 #----------------------------- Docker Variables -------------------------------#
 
+DOCKER			= docker
 DOCKER_COMPOSE		= docker-compose
 COMPOSE_FILE		= srcs/docker-compose.yml
 SCRIPT_PATH 		= srcs/requirements/utils/init_datadir.sh
+REMOVE_SCRIPT		= sudo rm -rf /home/elakhfif/data
 
 #---------------------------------- Rules -------------------------------------#
 
@@ -46,6 +48,7 @@ clean: down
 fclean: clean
 	@$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) down -v
 	@echo "$(RED)Containers and volumes are removed$(NC)"
+	@$(REMOVE_SCRIPT)
 
 prune: fclean
 	@$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) down --rmi all
