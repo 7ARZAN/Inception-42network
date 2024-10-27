@@ -6,17 +6,15 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/24 14:28:49 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/30 17:59:47 by tarzan           ###   ########.fr        #
+#    Updated: 2024/10/27 19:27:58 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM	alpine:3.19
+FROM	debian:buster
 
-RUN	apk -U upgrade && apk add --no-cache wget bash 
+RUN	apt update -y && apt install wget -y 
 
-RUN	wget -O /usr/local/bin/cadvisor https://github.com/google/cadvisor/releases/download/v0.47.0/cadvisor && \
-	chmod +x /usr/local/bin/cadvisor
+RUN	wget https://github.com/google/cadvisor/releases/download/v0.37.0/cadvisor && \ 
+	chmod +x cadvisor
 
-EXPOSE	8080
-
-CMD	[ "bash", "-c", "echo -e \"\033[1;32mStarting cAdvisor...\" && /usr/local/bin/cadvisor" ]
+CMD	[ "./cadvisor" ]
