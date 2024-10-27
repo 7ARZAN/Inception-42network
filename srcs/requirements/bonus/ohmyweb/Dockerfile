@@ -6,10 +6,17 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 02:10:14 by tarzan            #+#    #+#              #
-#    Updated: 2024/09/27 02:10:52 by tarzan           ###   ########.fr        #
+#    Updated: 2024/10/27 20:22:56 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-FROM	debian:bookworm
+FROM	alpine:3.19
 
-RUN	apt-get update && apt-get install -y curl
+RUN	apk add --no-cache lighttpd
+
+COPY	./assembly/  /var/www/localhost/htdocs/
+
+EXPOSE	80
+
+CMD	[ "lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf" ]
+

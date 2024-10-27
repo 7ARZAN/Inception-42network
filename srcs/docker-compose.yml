@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 23:28:09 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/27 19:37:33 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/27 20:39:13 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ services:
         secrets:
             - database-credentials
         healthcheck:
-            test: ["CMD", "mysqladmin", "-u", "stats", "--protocol=tcp", "ping"]
+            test: [ "CMD", "mysqladmin", "-u", "stats", "--protocol=tcp", "ping" ]
             interval: 5m
             timeout: 5s
             retries: 3
@@ -54,7 +54,7 @@ services:
             mariadb:
                 condition: service_healthy
         healthcheck:
-            test: ["CMD", "pgrep", "php-fpm"]
+            test: [ "CMD", "pgrep", "php-fpm" ]
             interval: 5m
             timeout: 5s
             retries: 3
@@ -99,7 +99,7 @@ services:
         networks:
             inception_network:
         healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
+            test: [ "CMD", "redis-cli", "ping" ]
             interval: 5m
             timeout: 5s
             retries: 3
@@ -132,7 +132,23 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
             - wordprss_files:/www
         healthcheck:
-            test: ["CMD", "wget", "--spider", "--timeout=5", "http://localhost:8080/health"]
+            test: [ "CMD", "wget", "--spider", "--timeout=5", "http://localhost:8080/health" ]
+        restart: always
+
+    ohmyweb:
+        container_name: ohmyweb
+        build: ./requirements/bonus/ohmyweb
+        ports:
+            - 80:80
+        networks:
+            inception_network:
+        volumes:
+            - ./requirements/bonus/ohmyweb/assembly/:/var/www/localhost/htdocs
+        healthcheck:
+            test: [ "CMD", "wget", "--spider", "http://localhost/" ]
+            interval: 30s
+            timeout: 10s
+            retries: 3
         restart: always
 
 volumes:
@@ -151,6 +167,8 @@ volumes:
 
 networks:
     inception_network:
+        name: inception_network
+        driver: bridge
 
 secrets:
     database-credentials:
