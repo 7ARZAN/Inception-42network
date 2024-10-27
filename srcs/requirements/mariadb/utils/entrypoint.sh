@@ -14,7 +14,7 @@
 
 source /run/secrets/database-credentials
 
-cat << EOF > query.sql
+cat << EOF > init.sql
 CREATE DATABASE IF NOT EXISTS $DB_NAME;
 CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWD';
 GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';
@@ -28,13 +28,13 @@ mysqld --user=mysql --datadir=/data > /dev/null 2>&1 &
 
 sleep 5
 
-mysql -u root < query.sql
+mysql -u root < init.sql
 
 kill $(jobs -p)
 
-rm -f query.sql
+rm -f init.sql
 
-cat << 'EOF' > launch.sh
+cat << 'EOF' > entrypoint.sh
 #!/bin/sh
 exec mysqld --user=mysql --datadir=/data --port=3306 --bind-address=0.0.0.0 --skip-networking=0
 EOF
