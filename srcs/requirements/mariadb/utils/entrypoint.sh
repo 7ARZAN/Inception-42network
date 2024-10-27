@@ -41,4 +41,4 @@ EOF
 
 chmod +x entrypoint.sh
 
-exec mysqld --user=mysql --datadir=/data --port=3306 --bind-address=0.0.0.0 --skip-networking=0
+exec  entrypoint.sh
