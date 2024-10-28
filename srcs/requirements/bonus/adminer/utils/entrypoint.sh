@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/30 17:32:07 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/26 05:44:46 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/28 05:00:09 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,6 @@ echo	"Initializing Adminer setup..."
 
 ADMINER_DIR="/www/html/adminer"
 mkdir	-p "$ADMINER_DIR"
-
 ADMINER_URL="https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1.php"
 ADMINER_PATH="$ADMINER_DIR/index.php"
 
