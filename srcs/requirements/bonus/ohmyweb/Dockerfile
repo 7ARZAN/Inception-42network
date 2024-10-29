@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/27 02:10:14 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/27 20:22:56 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/29 19:39:59 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ RUN	apk add --no-cache lighttpd
 
 COPY	./assembly/  /var/www/localhost/htdocs/
 
-EXPOSE	80
+EXPOSE	80/tcp
 
 CMD	[ "lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf" ]
 

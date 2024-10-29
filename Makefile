@@ -6,7 +6,7 @@
 #    By: tarzan <elakhfif@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/13 05:18:22 by tarzan            #+#    #+#              #
-#    Updated: 2024/10/26 04:03:07 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/29 18:53:57 by elakhfif         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,7 +42,7 @@ build:
 	@echo "$(GREEN)Containers are built$(NC)"
 
 clean: down
-	@$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) rm -f
+	@$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) rm
 	@echo "$(RED)Containers are removed$(NC)"
 
 fclean: clean
@@ -52,6 +52,7 @@ fclean: clean
 
 prune: fclean
 	@$(DOCKER_COMPOSE) -f $(COMPOSE_FILE) down --rmi all
+	@$(DOCKER) system prune
 	@echo "$(RED)Containers, volumes and images are removed$(NC)"
 
 restart: down up
