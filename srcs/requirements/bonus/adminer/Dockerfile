@@ -10,36 +10,16 @@
 #                                                                              #
 # **************************************************************************** #
 
-#FROM		alpine:3.19
-#
-#RUN		apk update && apk add php php-fpm wget procps
-#
-#WORKDIR		/www/html 
-#
-#COPY		./utils/entrypoint.sh /
-#
-#RUN		chmod +x /entrypoint.sh
-#
-#ENTRYPOINT	[ "/bin/sh", "/entrypoint.sh" ]
-#
-#CMD		[ "php-fpm",  "-F" ]
+FROM		debian:bookworm
 
-FROM debian:bookworm
+RUN		apt update -y && apt install php php-mysqli wget -y
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget \
-    php \
-    php-mysqli \
-    php-fpm \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR		/www 
 
-WORKDIR /www/html
+COPY		./utils/entrypoint.sh /
 
-COPY ./utils/entrypoint.sh /entrypoint.sh
+RUN		chmod +x /entrypoint.sh
 
-RUN chmod +x /entrypoint.sh
+ENTRYPOINT	[ "/bin/sh", "/entrypoint.sh" ]
 
-ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
-
-CMD ["php-fpm", "-F"]
+CMD		[ "php",  "-S", "0.0.0.0:8888" ]

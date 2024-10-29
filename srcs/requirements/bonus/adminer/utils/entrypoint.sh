@@ -14,21 +14,22 @@
 
 echo	"Initializing Adminer setup..."
 
-ADMINER_DIR="/www/html/adminer"
-mkdir	-p "$ADMINER_DIR"
-ADMINER_URL="https://github.com/vrana/adminer/releases/download/v4.8.1/adminer-4.8.1.php"
-ADMINER_PATH="$ADMINER_DIR/index.php"
+ADMINER_DIR="/www"
+ADMINER_URL="http://www.adminer.org/latest.php"
+ADMINER_PATH="$ADMINER_DIR/adminer.php"
 
-if [ ! -f "$ADMINER_PATH" ]; then
-	echo "Downloading Adminer..."
-	wget -q "$ADMINER_URL" -O "$ADMINER_PATH"
-	echo "Adminer downloaded successfully!"
-else
-	echo "Adminer is already installed."
-fi
+echo "Downloading Adminer..."
+wget -q "$ADMINER_URL" -O adminer.php
+echo "Adminer downloaded successfully!"
+
+mv adminer.php /www/adminer/
 
 chmod	755 "$ADMINER_PATH"
 echo	"Permissions set for Adminer."
 echo	"Adminer setup completed successfully!"
+
+cd /www/adminer
+
+#php -S 0.0.0.0:8888
 
 exec	"$@"

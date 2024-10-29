@@ -109,10 +109,12 @@ services:
     adminer:
         container_name: adminer
         build: ./requirements/bonus/adminer
+        ports:
+            - 8888:8888
         networks:
             inception_network:
         depends_on:
-            wordpress:
+            mariadb:
                 condition: service_healthy
         volumes:
             - wordprss_files:/www
@@ -141,7 +143,7 @@ services:
         ports:
             - 80:80
         networks:
-            inception_network:
+            - inception_network
         volumes:
             - ./requirements/bonus/ohmyweb/assembly/:/var/www/localhost/htdocs
         healthcheck:

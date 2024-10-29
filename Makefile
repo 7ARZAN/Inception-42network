@@ -19,7 +19,7 @@ NC			= \033[0m
 #----------------------------- Docker Variables -------------------------------#
 
 DOCKER			= docker
-DOCKER_COMPOSE		= docker-compose
+DOCKER_COMPOSE		= docker compose
 COMPOSE_FILE		= srcs/docker-compose.yml
 SCRIPT_PATH 		= srcs/requirements/utils/init_datadir.sh
 REMOVE_SCRIPT		= sudo rm -rf /home/elakhfif/data
