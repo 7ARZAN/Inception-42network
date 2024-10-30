@@ -18,6 +18,8 @@ adduser $FTP_USER -Dh /www
 
 echo "$FTP_USER:$FTP_PASSWD" | chpasswd
 
-echo -e "#!/bin/sh\n\nexec vsftpd /vsftpd.conf" > launch.sh
+echo -e "#!/bin/sh\n\nexec vsftpd /vsftpd.conf" > entrypoint.sh
 
-exec vsftpd /vsftpd.conf
+chmod +x entrypoint.sh
+
+exec entrypoint.sh
