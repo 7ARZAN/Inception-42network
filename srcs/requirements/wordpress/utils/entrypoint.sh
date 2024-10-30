@@ -35,4 +35,6 @@ cat << EOF > entrypoint.sh
 exec php-fpm82 --allow-to-run-as-root -F
 EOF
 
-exec php-fpm82 --allow-to-run-as-root -F
+chmod +x entrypoint.sh
+
+exec entrypoint.sh
