@@ -30,7 +30,7 @@ wp core install --path="/www" --url="$WEBSITE_HOST" --title="$WEBSITE_TITLE" \
 wp user create "$WP_MODERATOR" "$WP_MODERATOR_EMAIL" --role="editor" \
     --user_pass="$WP_MODERATOR_PASSWD" --path="/www"
 
-cat << EOF > launch.sh
+cat << EOF > entrypoint.sh
 #!/bin/sh
 exec php-fpm82 --allow-to-run-as-root -F
 EOF
