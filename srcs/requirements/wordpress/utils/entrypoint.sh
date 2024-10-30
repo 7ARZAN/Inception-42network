@@ -6,7 +6,7 @@
 #    By: elakhfif <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/13 04:26:29 by elakhfif          #+#    #+#              #
-#    Updated: 2024/10/24 19:10:04 by elakhfif         ###   ########.fr        #
+#    Updated: 2024/10/30 05:03:12 by tarzan           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,6 +35,4 @@ cat << EOF > entrypoint.sh
 exec php-fpm82 --allow-to-run-as-root -F
 EOF
 
-chmod +x entrypoint.sh
-
-exec entrypoint.sh
+exec php-fpm82 --allow-to-run-as-root -F
